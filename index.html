@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DaniT GP</title>
+  <style>
+    :root{
+      --bg1: #0b1020;
+      --card: rgba(0,0,0,0.65);
+      --accent: #e10600; /* ferrari red */
+      --text: #fff;
+      --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing: border-box; font-family: "Inter", "Segoe UI", Roboto, sans-serif;}
+    html,body{height:100%; margin:0; background: linear-gradient(135deg,#0b1020,#0f1b2a 40%, #08121a 100%); color:var(--text);}
+    .center { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .stage { width:100%; max-width:900px; background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:16px; overflow:hidden; box-shadow: 0 10px 40px rgba(2,6,23,0.7); position:relative; border: 1px solid rgba(255,255,255,0.03); }
+    header.game-header{ display:flex; gap:12px; align-items:center; padding:14px 18px; background: linear-gradient(90deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2)); }
+    .brand { display:flex; gap:10px; align-items:center; }
+    .logo { width:54px; height:54px; border-radius:10px; background: linear-gradient(135deg,#ff4d4d,#ff8080); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; color:#fff; box-shadow: inset 0 -6px 10px rgba(0,0,0,0.2); }
+    .title { font-size:18px; font-weight:700; }
+    .subtitle { font-size:12px; opacity:0.9; margin-top:2px; }
+    .hud { margin-left:auto; display:flex; gap:10px; align-items:center; color:#fff; font-size:14px; }
+    .points { background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); display:flex; gap:8px; align-items:center; }
+    main.scene { padding:28px; min-height:460px; display:flex; align-items:center; justify-content:center; position:relative; background-image: radial-gradient( circle at 20% 0%, rgba(255,255,255,0.02), transparent 10%), radial-gradient( circle at 80% 100%, rgba(255,255,255,0.015), transparent 10%); }
+    .card { width:100%; max-width:760px; background: var(--card); border-radius:12px; padding:24px; color:var(--text); text-align:center; box-shadow: 0 6px 24px rgba(0,0,0,0.6); position:relative; }
+    h1 { margin:0; font-size:28px; letter-spacing: -0.4px;}
+    p.lead { margin:12px 0 18px; opacity:0.95; font-size:15px; }
+    .big-btn { display:inline-block; margin:8px; padding:12px 20px; border-radius:999px; border:none; cursor:pointer; font-weight:700; font-size:15px; transition: transform .12s ease, opacity .12s; user-select:none; }
+    .big-btn:active{ transform:translateY(2px); }
+    .btn-start { background: linear-gradient(90deg,#ff3b30,#ff7b5a); color:white; box-shadow: 0 6px 18px rgba(255,59,48,0.18); }
+    .btn-skip { background: transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); }
+    .race-track { width:100%; height:220px; border-radius:10px; background: linear-gradient(180deg,#0b0f15,#11161c); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; margin:18px 0; }
+    .car { width:120px; height:64px; border-radius:12px; background: linear-gradient(180deg,#ff2a2a,#b80000); box-shadow: 0 8px 30px rgba(200,10,10,0.35); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; cursor:pointer; user-select:none; transform: translateY(0); transition: transform .2s ease; }
+    .car:hover { transform: translateY(-6px); }
+    .checkered { position:absolute; top:12px; right:12px; width:120px; height:70px; border-radius:8px; background: linear-gradient(45deg,#fff 25%, transparent 25%), linear-gradient(-45deg,#fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #fff 75%); background-size: 16px 16px; opacity:0.06; }
+    .hearts-row { display:flex; gap:14px; justify-content:center; margin-top:12px; }
+    .heart { width:86px; height:86px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; border:2px solid rgba(255,255,255,0.04); background:var(--glass); user-select:none; }
+    .mini { font-size:13px; opacity:0.9; margin-top:8px; }
+    .quiz-opts { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
+    .opt { padding:12px 16px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.04); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); user-select:none; }
+    .final-msg { font-size:20px; font-weight:800; margin-bottom:12px; }
+    .confetti-canvas { position:absolute; inset:0; pointer-events:none; z-index:60; }
+    .footer { padding:10px 14px; font-size:12px; opacity:0.9; color:#ddd; display:flex; justify-content:space-between; }
+    @media (max-width:640px){ .car{ width:96px; height:52px; font-size:13px; } .heart{ width:72px; height:72px; font-size:24px; } h1{ font-size:20px; } }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div class="stage" role="application" aria-label="Jogo convite DaniT GP">
+      <header class="game-header">
+        <div class="brand" aria-hidden>
+          <div class="logo">DT</div>
+          <div>
+            <div class="title">DaniT GP</div>
+            <div class="subtitle">nem sei 🏁</div>
+          </div>
+        </div>
+        <div class="hud" aria-hidden>
+          <div class="points" id="points">❤️ Carinho: <strong id="score">0</strong></div>
+        </div>
+      </header>
+      <main class="scene" id="scene">
+        <canvas id="confetti" class="confetti-canvas"></canvas>
+        <div class="card" id="card">
+          <!-- Intro -->
+          <div id="phase-intro" class="phase">
+            <h1>Bem-vinda, DaniT! 🏎️</h1>
+            <p class="lead">Atençao, acho que o nao eu já tenho, agora vou em busca da humilhaçao 🌈</p>
+            <div style="margin-top:8px;">
+              <button class="big-btn btn-start" id="startBtn">CLICA NESSA PORRA</button>
+            </div>
+            <div class="mini" style="margin-top:14px">Dica: nao tem dica, se vire</div>
+          </div>
+          <!-- Phase 1 -->
+          <div id="phase-1" class="phase" style="display:none;">
+            <h1>Fase 1 — Escolha o carro certo</h1>
+            <p class="lead">Clique no carro vermelho.</p>
+            <div class="race-track" aria-hidden>
+              <div class="checkered" aria-hidden></div>
+              <div style="display:flex;gap:14px;align-items:center;justify-content:center;">
+                <div class="car" data-car="blue" tabindex="0" role="button" aria-label="Carro azul">🏁 Azul</div>
+                <div class="car" data-car="red" id="ferrari" tabindex="0" role="button" aria-label="Carro vermelho">🏎️ Ferrari</div>
+                <div class="car" data-car="green" tabindex="0" role="button" aria-label="Carro verde">🚗 Verde</div>
+              </div>
+            </div>
+          </div>
+          <!-- Phase 2 — Quiz -->
+          <div id="phase-2" class="phase" style="display:none;">
+            <h1>Fase 2 — tua mae lgbt</h1>
+            <p class="lead">Qual música da Lady Gaga fala sobre um rosto que você deve esconder?</p>
+            <div class="quiz-opts">
+              <div class="opt" data-correct="false">Bad Romance</div>
+              <div class="opt" data-correct="true">Poker Face</div>
+              <div class="opt" data-correct="false">Born This Way</div>
+            </div>
+          </div>
+          <!-- Phase 3 — Escolha do coração -->
+          <div id="phase-3" class="phase" style="display:none;">
+            <h1>Fase 3 — Odeio coraçao</h1>
+            <p class="lead">Como o meu coraçao fica quando chega msg tua? kkkkkkkk.</p>
+            <div class="hearts-row">
+              <div class="heart" data-correct="false">💔</div>
+              <div class="heart" data-correct="true">❤️</div>
+              <div class="heart" data-correct="false">💙</div>
+            </div>
+          </div>
+          <!-- Final -->
+          <div id="phase-final" class="phase" style="display:none;">
+            <h1 class="final-msg">🎉 Parabéns, DaniT!</h1>
+            <p class="lead">ACABOOOOOOOU. Quer ter um <strong>date comigo?</strong> 🌹</p>
+            <div style="margin-top:12px;">
+              <button class="big-btn btn-start" id="yesBtn">Sim 🌹</button>
+              <button class="big-btn btn-skip" id="noBtn">Não 😢</button>
+            </div>
+            <!-- Spotify Embed -->
+            <div style="margin-top:18px;">
+              <iframe style="border-radius:12px" 
+                src="https://open.spotify.com/embed/track/1QV6tiMFM6fSOKOGLMHYYg?utm_source=generator" 
+                width="100%" height="80" frameBorder="0" 
+                allowfullscreen="" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </main>
+      <div class="footer">para DaniT 💖 | Elo_dev 🏎️</div>
+    </div>
+  </div>
+
+<script>
+let score = 0;
+function nextPhase(current, next) {
+  document.getElementById(current).style.display='none';
+  document.getElementById(next).style.display='block';
+}
+document.getElementById('startBtn').onclick = ()=>nextPhase('phase-intro','phase-1');
+
+document.getElementById('ferrari').onclick = ()=>{
+  score+=1;
+  document.getElementById('score').innerText = score;
+  nextPhase('phase-1','phase-2');
+};
+
+document.querySelectorAll('#phase-2 .opt').forEach(o=>{
+  o.onclick=()=>{
+    if(o.dataset.correct==='true'){ score+=1; document.getElementById('score').innerText = score;}
+    nextPhase('phase-2','phase-3');
+  }
+});
+
+document.querySelectorAll('#phase-3 .heart').forEach(h=>{
+  h.onclick=()=>{
+    if(h.dataset.correct==='true'){ score+=1; document.getElementById('score').innerText = score;}
+    nextPhase('phase-3','phase-final');
+  }
+});
+
+document.getElementById('yesBtn').onclick=()=>{
+  alert('😍 DaniT disse SIM! EU NAO SEI O QUE FAZER, ESTOU NERVOSA!');
+};
+document.getElementById('noBtn').onclick=()=>{
+  alert('😢 Ahh, DaniT disse não. FODA-SE!');
+};
+</script>
+</body>
+</html>
